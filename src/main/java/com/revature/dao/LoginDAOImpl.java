@@ -492,6 +492,8 @@ public class LoginDAOImpl implements LoginDAO {
 		System.out.println("Which user do you want to focus on?");
 		Scanner sc = new Scanner(System.in);
 		String uName = sc.nextLine();
+		if (uName.equals("back"))
+			return true;
 		String sqlTarget = "UPDATE user_info SET approval_status = ? WHERE user_name = ?";
 		PreparedStatement statementTarget = conn.prepareStatement(sqlTarget);
 		System.out.println("Do you want to:\n1: Approve\n2: Deny");
