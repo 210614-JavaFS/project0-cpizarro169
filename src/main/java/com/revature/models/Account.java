@@ -2,6 +2,7 @@ package com.revature.models;
 
 public class Account {
 	
+	private int accountID;
 	private String uName;
 	private String pWord;
 	private String fname;
@@ -12,9 +13,10 @@ public class Account {
 	private double checking_balance;
 	private double saving_balance;
 	
-	public Account(String uName, String pWord, String fname, String lname, String accessType, boolean has_savings, boolean has_checkings,
+	public Account(int accountID, String uName, String pWord, String fname, String lname, String accessType, boolean has_savings, boolean has_checkings,
 			double checking_balance, double saving_balance) {
 		super();
+		this.accountID = accountID;
 		this.uName = uName;
 		this.pWord = pWord;
 		this.fname = fname;
@@ -30,6 +32,16 @@ public class Account {
 
 	public Account() {
 		super();
+	}
+
+	
+	
+	public int getAccountID() {
+		return accountID;
+	}
+
+	public void setAccountID(int accountID) {
+		this.accountID = accountID;
 	}
 
 	public String getuName() {
@@ -109,6 +121,7 @@ public class Account {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((accessType == null) ? 0 : accessType.hashCode());
+		result = prime * result + accountID;
 		long temp;
 		temp = Double.doubleToLongBits(checking_balance);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -136,6 +149,8 @@ public class Account {
 			if (other.accessType != null)
 				return false;
 		} else if (!accessType.equals(other.accessType))
+			return false;
+		if (accountID != other.accountID)
 			return false;
 		if (Double.doubleToLongBits(checking_balance) != Double.doubleToLongBits(other.checking_balance))
 			return false;
@@ -170,9 +185,10 @@ public class Account {
 
 	@Override
 	public String toString() {
-		return "Account [uName=" + uName + ", pWord=" + pWord + ", fname=" + fname + ", lname=" + lname
-				+ ", accessType=" + accessType + ", has_checkings=" + has_checkings + ", has_savings=" + has_savings
-				+ ", checking_balance=" + checking_balance + ", saving_balance=" + saving_balance + "]";
+		return "Account [accountID=" + accountID + ", uName=" + uName + ", pWord=" + pWord + ", fname=" + fname
+				+ ", lname=" + lname + ", accessType=" + accessType + ", has_checkings=" + has_checkings
+				+ ", has_savings=" + has_savings + ", checking_balance=" + checking_balance + ", saving_balance="
+				+ saving_balance + "]";
 	}
 
 	

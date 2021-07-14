@@ -24,7 +24,7 @@ public class LoginController {
 		}
 		else if(loggedIn.equals("employee")) {
 			System.out.println("Welcome Employee");
-			//employeeOptions();
+			employeeOptions(uName);
 			return;
 		}
 		else if(loggedIn.equals("customer")) {
@@ -34,7 +34,7 @@ public class LoginController {
 		}
 		else if(loggedIn.equals("admin")) {
 			System.out.println("Welcome Admin");
-			//adminOptions();
+			adminOptions(uName);
 			return;
 		}
 	}
@@ -89,6 +89,139 @@ public class LoginController {
 				break;
 			case 4:
 				//loginService.updateInformation();
+				break;
+			case 5:
+				System.out.println("Thank you for choosing Rev Bank! Returning to the main menu");
+				return;
+			default:
+				System.out.println("Please try again");
+			}
+		}
+		
+		
+	}
+	public void employeeOptions(String uName) {
+		while(true) {
+			System.out.println("Here are your options\n"
+					+ "1:Approve or Deny Accounts\n"
+					+ "2:Check Customer Account\n"
+					+ "3:Check Customer Information\n"
+					+ "4:Logout");
+			
+			int response = sc.nextInt();
+			double amount;
+			sc.nextLine();
+			
+			switch(response) {
+			case 1:
+				if (loginService.approveAccountEmployee())
+					{
+						continue;
+					}
+				else 
+					{
+					System.out.println("Sorry about then error.");
+					}
+				break;
+			case 2:
+				System.out.println("Which user are you looking for?");
+				String uNameTarget = sc.nextLine();
+				//sc.nextLine();
+				if (loginService.checkAccountEmployee(uNameTarget))
+					{
+						continue;
+					}
+				else 
+					{
+					System.out.println("Sorry about then error.");
+					}
+				break;
+			case 3:
+				System.out.println("Which user are you looking for?");
+				String uNameTargetInfo = sc.nextLine();
+				//sc.nextLine();
+				if (loginService.checkInfoEmployee(uNameTargetInfo))
+				{
+					continue;
+				}
+				else 
+				{
+				System.out.println("Sorry about then error.");
+				}
+				break;
+			case 4:
+				System.out.println("Thank you for choosing Rev Bank! Returning to the main menu");
+				return;
+			default:
+				System.out.println("Please try again");
+			}
+		}
+		
+		
+	}
+	
+	public void adminOptions(String uName) {
+		while(true) {
+			System.out.println("Here are your options\n"
+					+ "1:Approve or Deny Accounts\n"
+					+ "2:Check an Account\n"
+					+ "3:Check Information\n"
+					+ "4:Delete Account\n"
+					+ "5:Logout");
+			
+			int response = sc.nextInt();
+			double amount;
+			sc.nextLine();
+			
+			switch(response) {
+			case 1:
+				if (loginService.approveAccountEmployee())
+					{
+						continue;
+					}
+				else 
+					{
+					System.out.println("Sorry about then error.");
+					}
+				break;
+			case 2:
+				System.out.println("Which user are you looking for?");
+				String uNameTarget = sc.nextLine();
+				//sc.nextLine();
+				if (loginService.checkAccountEmployee(uNameTarget))
+					{
+						continue;
+					}
+				else 
+					{
+					System.out.println("Sorry about then error.");
+					}
+				break;
+			case 3:
+				System.out.println("Which user are you looking for?");
+				String uNameTargetInfo = sc.nextLine();
+				//sc.nextLine();
+				if (loginService.checkInfoEmployee(uNameTargetInfo))
+				{
+					continue;
+				}
+				else 
+				{
+				System.out.println("Sorry about then error.");
+				}
+				break;
+			case 4:
+				System.out.println("Which user are you looking for?");
+				String uNameTargetDelete = sc.nextLine();
+				//sc.nextLine();
+				if (loginService.deleteAccount(uNameTargetDelete))
+				{
+					continue;
+				}
+				else 
+				{
+				System.out.println("Sorry about then error.");
+				}
 				break;
 			case 5:
 				System.out.println("Thank you for choosing Rev Bank! Returning to the main menu");

@@ -8,5 +8,13 @@ public interface LoginDAO {
 	public boolean makeWithdrawal(String uName, double amount); 
 	
 	public boolean makeTransfer(String uName, double amount, int accountNumber);
+	
+	public boolean approveAccountEmployee();
+	
+	public boolean checkAccountEmployee(String uName);
+	
+	public boolean checkInfoEmployee(String uName);
+	
+	public boolean deleteAccount(String uName);
 
 }

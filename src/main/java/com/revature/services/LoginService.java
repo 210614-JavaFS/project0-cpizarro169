@@ -21,5 +21,21 @@ public class LoginService {
 	public boolean makeTransfer(String uName, double amount, int accountNumber) {
 		return loginDAO.makeTransfer(uName, amount, accountNumber);
 	}
+	
+	public boolean approveAccountEmployee() {
+		return loginDAO.approveAccountEmployee();
+	}
+	
+	public boolean checkAccountEmployee(String uName) {
+		return loginDAO.checkAccountEmployee(uName);
+	}
+	
+	public boolean checkInfoEmployee(String uName) {
+		return loginDAO.checkInfoEmployee(uName);
+	}
+	
+	public boolean deleteAccount(String uName) {
+		return loginDAO.deleteAccount(uName);
+	}
 
 }

@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.revature.models.Account;
+import com.revature.models.User;
 import com.revature.utils.ConnectionUtil;
 
 public class LoginDAOImpl implements LoginDAO {
@@ -215,7 +217,7 @@ public class LoginDAOImpl implements LoginDAO {
 				statementUpdate.setDouble(1, currentBalance-amount);
 				statementUpdate.setString(2, uName);
 				statementUpdate.executeUpdate();
-				System.out.println("Deposit successful\nNew Balance is: $" + (currentBalance-amount));
+				System.out.println("Withdrawal successful\nNew Balance is: $" + (currentBalance-amount));
 				return true;
 				}
 				else
@@ -264,7 +266,7 @@ public class LoginDAOImpl implements LoginDAO {
 				statementUpdate.setDouble(1, currentBalance-amount);
 				statementUpdate.setString(2, uName);
 				statementUpdate.executeUpdate();
-				System.out.println("Deposit successful\nNew Balance is: $" + (currentBalance-amount));
+				System.out.println("Withdrawal successful\nNew Balance is: $" + (currentBalance-amount));
 				return true;
 				}
 				else
@@ -293,10 +295,12 @@ public class LoginDAOImpl implements LoginDAO {
 			Scanner sc = new Scanner(System.in);
 			int whichAccount;
 			boolean trigger = true;
+			//System.out.println("check 1");
 			String sqlAccount = "SELECT account_id,has_checkings FROM bank_account WHERE account_id = ?;";
 			PreparedStatement statementAccount = conn.prepareStatement(sqlAccount);
-			statementAccount.setString(1, uName);
+			statementAccount.setInt(1, accountNumber);
 			ResultSet resultAccount = statementAccount.executeQuery();
+			System.out.println("check 2");
 			if(resultAccount.next() && resultAccount.getBoolean(2))
 			{
 			System.out.println("Transfer from\n1:Checkings\n2:Savings");
@@ -334,17 +338,30 @@ public class LoginDAOImpl implements LoginDAO {
 					}
 					else 
 					{
-						System.out.println("Ok we will be withdrawing: $" + amount);
+						System.out.println("Ok we will be transferring: $" + amount);
 						trigger = false;
 					}
 				}
 				//sc.close();
-				String sqlUpdate = "UPDATE bank_account SET checkings_balance = ? WHERE u_name = ?;";
-				PreparedStatement statementUpdate = conn.prepareStatement(sqlUpdate);
-				statementUpdate.setDouble(1, currentBalance-amount);
-				statementUpdate.setString(2, uName);
-				statementUpdate.executeUpdate();
-				System.out.println("Deposit successful\nNew Balance is: $" + (currentBalance-amount));
+				String sqlTarget = "SELECT checkings_balance FROM bank_account WHERE account_id = ?;";
+				//Scanner sc = new Scanner(System.in);
+				PreparedStatement statementTarget = conn.prepareStatement(sqlTarget);
+				statementTarget.setInt(1, accountNumber);
+				ResultSet resultTarget = statementTarget.executeQuery();
+				resultTarget.next();
+				double currentBalanceTarget = resultTarget.getDouble(1);
+				System.out.println("Target has a balance of: " + currentBalanceTarget);
+				String sqlUpdateOrigin = "UPDATE bank_account SET checkings_balance = ? WHERE u_name = ?;";
+				PreparedStatement statementUpdateOrigin = conn.prepareStatement(sqlUpdateOrigin);
+				statementUpdateOrigin.setDouble(1, currentBalance-amount);
+				statementUpdateOrigin.setString(2, uName);
+				statementUpdateOrigin.executeUpdate();
+				String sqlUpdateTarget = "UPDATE bank_account SET checkings_balance = ? WHERE account_id = ?;";
+				PreparedStatement statementUpdateTarget = conn.prepareStatement(sqlUpdateTarget);
+				statementUpdateTarget.setDouble(1, currentBalanceTarget+amount);
+				statementUpdateTarget.setInt(2, accountNumber);
+				statementUpdateTarget.executeUpdate();
+				System.out.println("Transfer successful\nNew Balance is: $" + (currentBalance-amount));
 				return true;
 				}
 				else
@@ -388,12 +405,25 @@ public class LoginDAOImpl implements LoginDAO {
 					}
 				}
 				//sc.close();
-				String sqlUpdate = "UPDATE bank_account SET savings_balance = ? WHERE u_name = ?;";
-				PreparedStatement statementUpdate = conn.prepareStatement(sqlUpdate);
-				statementUpdate.setDouble(1, currentBalance-amount);
-				statementUpdate.setString(2, uName);
-				statementUpdate.executeUpdate();
-				System.out.println("Deposit successful\nNew Balance is: $" + (currentBalance-amount));
+				String sqlTarget = "SELECT savings_balance FROM bank_account WHERE account_id = ?;";
+				//Scanner sc = new Scanner(System.in);
+				PreparedStatement statementTarget = conn.prepareStatement(sqlTarget);
+				statementTarget.setInt(1, accountNumber);
+				
+				ResultSet resultTarget = statement.executeQuery();
+				resultTarget.next();
+				double currentBalanceTarget = resultTarget.getDouble(1);
+				String sqlUpdateOrigin = "UPDATE bank_account SET savings_balance = ? WHERE u_name = ?;";
+				PreparedStatement statementUpdateOrigin = conn.prepareStatement(sqlUpdateOrigin);
+				statementUpdateOrigin.setDouble(1, currentBalance-amount);
+				statementUpdateOrigin.setString(2, uName);
+				statementUpdateOrigin.executeUpdate();
+				String sqlUpdateTarget = "UPDATE bank_account SET checkings_balance = ? WHERE u_name = ?;";
+				PreparedStatement statementUpdateTarget = conn.prepareStatement(sqlUpdateTarget);
+				statementUpdateTarget.setDouble(1, currentBalanceTarget+amount);
+				statementUpdateTarget.setString(2, uName);
+				statementUpdateTarget.executeUpdate();
+				System.out.println("Transfer successful\nNew Balance is: $" + (currentBalanceTarget-amount));
 				return true;
 				}
 				else
@@ -418,5 +448,135 @@ public class LoginDAOImpl implements LoginDAO {
 		}
 		return false;
 
+	}
+
+	@Override
+	public boolean approveAccountEmployee() {
+		try(Connection conn = ConnectionUtil.getConnection()){
+		User user = new User();
+		String sql = "SELECT * FROM user_info WHERE approval_status = 0 AND access_type = 'customer';";
+		//Scanner sc = new Scanner(System.in);
+		PreparedStatement statement = conn.prepareStatement(sql);
+		ResultSet result = statement.executeQuery();
+		while(result.next())
+		{
+		user.setFirstName(result.getString("first_name"));
+		user.setLastName(result.getString("last_name"));
+		user.setUserName(result.getString("user_name"));
+		user.setAddress(result.getString("address"));
+		user.setPhoneNumber(result.getString("phone_number"));
+		user.setEmail(result.getString("email"));
+		System.out.println(user);
+		}
+		System.out.println("Which user do you want to focus on?");
+		Scanner sc = new Scanner(System.in);
+		String uName = sc.nextLine();
+		String sqlTarget = "UPDATE user_info SET approval_status = ? WHERE user_name = ?";
+		PreparedStatement statementTarget = conn.prepareStatement(sqlTarget);
+		System.out.println("Do you want to:\n1: Approve\n2: Deny");
+		int choice = sc.nextInt();
+		if(choice == 1)
+		{
+			statementTarget.setInt(1, 2);
+		}
+		else if(choice == 2)
+		{
+			statementTarget.setInt(1, 1);
+		}
+		statementTarget.setString(2,uName);
+		statementTarget.executeUpdate();
+		System.out.println("Decision Successful");
+		
+		return true;
+	}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+}
+
+	@Override
+	public boolean checkAccountEmployee(String uName) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			Account account = new Account();
+			String sql = "SELECT * FROM bank_account WHERE u_name = ?;";
+			PreparedStatement statement = conn.prepareStatement(sql);
+			statement.setString(1,uName);
+			ResultSet result = statement.executeQuery();
+			if(result.next())
+			{
+			account.setuName(result.getString("u_name"));
+			account.setpWord(result.getString("p_word"));
+			account.setAccountID(result.getInt("account_id"));
+			account.setHas_checkings(result.getBoolean("has_checkings"));
+			account.setChecking_balance(result.getDouble("checkings_balance"));
+			account.setHas_checkings(result.getBoolean("has_checkings"));
+			account.setChecking_balance(result.getDouble("checkings_balance"));
+			}
+			System.out.println(account);
+			
+			return true;
+		}
+			catch(SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+	}
+
+	@Override
+	public boolean checkInfoEmployee(String uName) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			User user = new User();
+			String sql = "SELECT * FROM user_info WHERE user_name = ?;";
+			PreparedStatement statement = conn.prepareStatement(sql);
+			statement.setString(1,uName);
+			ResultSet result = statement.executeQuery();
+			if(result.next())
+			{
+				user.setFirstName(result.getString("first_name"));
+				user.setLastName(result.getString("last_name"));
+				user.setUserName(result.getString("user_name"));
+				user.setAddress(result.getString("address"));
+				user.setPhoneNumber(result.getString("phone_number"));
+				user.setEmail(result.getString("email"));
+			}
+			System.out.println(user);
+			
+			return true;
+		}
+			catch(SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+	}
+
+	@Override
+	public boolean deleteAccount(String uName) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			String sql = "SELECT * FROM user_info WHERE user_name = ?;";
+			PreparedStatement statement = conn.prepareStatement(sql);
+			statement.setString(1,uName);
+			ResultSet result = statement.executeQuery();
+			if(result.next())
+			{
+				System.out.println("User located and preparing for deletion");
+			}
+			else
+				return false;
+			String sqlBank = "DELETE FROM bank_account WHERE u_name =?";
+			PreparedStatement statementbank = conn.prepareStatement(sqlBank);
+			statementbank.setString(1,uName);
+			statementbank.executeUpdate();
+			String sqlUser = "DELETE FROM user_info WHERE user_name =?";
+			PreparedStatement statementuser = conn.prepareStatement(sqlUser);
+			statementuser.setString(1,uName);
+			statementuser.executeUpdate();
+			System.out.println("Deletion Completed");
+			return true;
+		}
+			catch(SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
 	}
 }
