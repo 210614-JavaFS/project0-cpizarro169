@@ -10,7 +10,11 @@ import com.revature.models.Account;
 import com.revature.models.User;
 import com.revature.utils.ConnectionUtil;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 public class LoginDAOImpl implements LoginDAO {
+	private static Logger log = LoggerFactory.getLogger(LoginDAOImpl.class);
 
 	@Override
 	public String loginCheck(String uName, String pWord) {
@@ -28,27 +32,32 @@ public class LoginDAOImpl implements LoginDAO {
 				{
 					String accessType = result.getString(1);
 					System.out.println("Login successful");
+					log.info("Login successful");
 					return accessType;
 				}
 				else if(result.getInt(2) == 1)
 				{
 					System.out.println("Your account was denied, please call for further assistance");
+					log.warn("Your account was denied, please call for further assistance");
 					return "failure";
 				}
 				else
 				{
 					System.out.println("Account is still awaiting approval");
+					log.warn("Your account was denied, please call for further assistance");
 					return "failure";
 				}
 			}
 				
 			else {
 				System.out.println("Username or password didn't match");
+				log.warn("Username or password didn't match");
 				return "failure";
 			}
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
+			log.warn("Username or password not found");
 		}
 		
 		return "failure";
@@ -86,6 +95,7 @@ public class LoginDAOImpl implements LoginDAO {
 					if (amount <= 0.0)
 					{
 						System.out.println("The amount is not valid, please enter a valid amount");
+						log.warn("The amount is not valid, please enter a valid amount");
 						amount = sc.nextDouble();
 					}
 					else 
@@ -101,11 +111,13 @@ public class LoginDAOImpl implements LoginDAO {
 				statementUpdate.setString(2, uName);
 				statementUpdate.executeUpdate();
 				System.out.println("Deposit successful\nNew Balance is: $" + (currentBalance+amount));
+				log.info("Deposit successful");
 				return true;
 				}
 				else
 				{
 					System.out.println("You don't have a checkings account");
+					log.warn("No checkings account available");
 					return false;
 				}
 			case 2:
@@ -145,16 +157,19 @@ public class LoginDAOImpl implements LoginDAO {
 				statementUpdate.setString(2, uName);
 				statementUpdate.executeUpdate();
 				System.out.println("Deposit successful\nNew Balance is: $" + (currentBalance+amount));
+				log.info("Deposit successful");
 				return true;
 				}
 				else
 				{
 					System.out.println("You don't have a savings account");
+					log.warn("No savings account available");
 					return false;
 				}
 				
 			default:
 				System.out.println("Choose a valid option");
+				log.warn("invalid choice");
 				}
 				
 				
@@ -218,6 +233,7 @@ public class LoginDAOImpl implements LoginDAO {
 				statementUpdate.setString(2, uName);
 				statementUpdate.executeUpdate();
 				System.out.println("Withdrawal successful\nNew Balance is: $" + (currentBalance-amount));
+				log.info("Withdrawal successful");
 				return true;
 				}
 				else
@@ -247,11 +263,13 @@ public class LoginDAOImpl implements LoginDAO {
 					if (amount <= 0.0)
 					{
 						System.out.println("The amount is not valid, please enter a valid amount");
+						log.warn("Amount invalid");
 						amount = sc.nextDouble();
 					}
 					else if (amount > currentBalance)
 					{
 						System.out.println("Sorry, we don't do overdrafts.");
+						log.warn("Overdraft attempted");
 						return false;
 					}
 					else 
@@ -267,6 +285,7 @@ public class LoginDAOImpl implements LoginDAO {
 				statementUpdate.setString(2, uName);
 				statementUpdate.executeUpdate();
 				System.out.println("Withdrawal successful\nNew Balance is: $" + (currentBalance-amount));
+				log.info("Withdrawal successful");
 				return true;
 				}
 				else
@@ -362,6 +381,7 @@ public class LoginDAOImpl implements LoginDAO {
 				statementUpdateTarget.setInt(2, accountNumber);
 				statementUpdateTarget.executeUpdate();
 				System.out.println("Transfer successful\nNew Balance is: $" + (currentBalance-amount));
+				log.info("Transfer successful");
 				return true;
 				}
 				else
@@ -424,6 +444,7 @@ public class LoginDAOImpl implements LoginDAO {
 				statementUpdateTarget.setString(2, uName);
 				statementUpdateTarget.executeUpdate();
 				System.out.println("Transfer successful\nNew Balance is: $" + (currentBalanceTarget-amount));
+				log.info("Transfer successful");
 				return true;
 				}
 				else
@@ -486,6 +507,7 @@ public class LoginDAOImpl implements LoginDAO {
 		statementTarget.setString(2,uName);
 		statementTarget.executeUpdate();
 		System.out.println("Decision Successful");
+		log.info("Decision successful");
 		
 		return true;
 	}
@@ -549,6 +571,99 @@ public class LoginDAOImpl implements LoginDAO {
 			}
 			return false;
 	}
+	
+	@Override
+	public boolean editInformation(String uName) {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			User user = new User();
+			String sql = "SELECT * FROM user_info WHERE user_name = ?;";
+			PreparedStatement statement = conn.prepareStatement(sql);
+			statement.setString(1,uName);
+			ResultSet result = statement.executeQuery();
+			if(result.next())
+			{
+				user.setFirstName(result.getString("first_name"));
+				user.setLastName(result.getString("last_name"));
+				user.setUserName(result.getString("user_name"));
+				user.setAddress(result.getString("address"));
+				user.setPhoneNumber(result.getString("phone_number"));
+				user.setEmail(result.getString("email"));
+			}
+			System.out.println("Your Current Information Is:");
+			System.out.println(user);
+			boolean trigger = true;
+			Scanner sc = new Scanner(System.in);
+			while(trigger) {
+			System.out.println("Which information would you like to edit?\n1:First name\n2:Last name\n3:Address\n4:Phone number\n5:Email\n6:Exit");
+			int choice = sc.nextInt();
+			sc.nextLine();
+			switch (choice)
+			{
+			case 1:
+				System.out.println("Enter new first name");
+				user.setFirstName(sc.nextLine());
+				String sqlfName = "UPDATE user_info SET first_name = ? WHERE user_name = ?";
+				PreparedStatement statementfName = conn.prepareStatement(sqlfName);
+				statementfName.setString(1,user.getFirstName());
+				statementfName.setString(2,uName);
+				statementfName.executeUpdate();
+				System.out.println("Update complete");
+				return true;
+			case 2:
+				System.out.println("Enter new last name");
+				user.setLastName(sc.nextLine());
+				String sqllName = "UPDATE user_info SET last_name = ? WHERE user_name = ?";
+				PreparedStatement statementlName = conn.prepareStatement(sqllName);
+				statementlName.setString(1,user.getLastName());
+				statementlName.setString(2,uName);
+				statementlName.executeUpdate();
+				System.out.println("Update complete");
+				return true;
+				
+			case 3:
+				System.out.println("Enter new address");
+				user.setAddress(sc.nextLine());
+				String sqlAddress = "UPDATE user_info SET address = ? WHERE user_name = ?";
+				PreparedStatement statementAddress = conn.prepareStatement(sqlAddress);
+				statementAddress.setString(1,user.getAddress());
+				statementAddress.setString(2,uName);
+				statementAddress.executeUpdate();
+				System.out.println("Update complete");
+				return true;
+			case 4:
+				System.out.println("Enter new phone number");
+				user.setPhoneNumber(sc.nextLine());
+				String sqlPhone = "UPDATE user_info SET phone_number = ? WHERE user_name = ?";
+				PreparedStatement statementPhone = conn.prepareStatement(sqlPhone);
+				statementPhone.setString(1,user.getPhoneNumber());
+				statementPhone.setString(2,uName);
+				statementPhone.executeUpdate();
+				System.out.println("Update complete");
+				return true;
+			case 5:
+				System.out.println("Enter new email");
+				user.setEmail(sc.nextLine());
+				String sqlEmail = "UPDATE user_info SET email = ? WHERE user_name = ?";
+				PreparedStatement statementEmail = conn.prepareStatement(sqlEmail);
+				statementEmail.setString(1,user.getEmail());
+				statementEmail.setString(2,uName);
+				statementEmail.executeUpdate();
+				System.out.println("Update complete");
+				return true;
+			case 6:
+				System.out.println("Returning");
+				return true;
+			default:
+				System.out.println("Please choose a valid option");
+				
+			}
+			}
+		}
+			catch(SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+	}
 
 	@Override
 	public boolean deleteAccount(String uName) {
@@ -572,6 +687,55 @@ public class LoginDAOImpl implements LoginDAO {
 			statementuser.setString(1,uName);
 			statementuser.executeUpdate();
 			System.out.println("Deletion Completed");
+			return true;
+		}
+			catch(SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+	}
+
+	@Override
+	public boolean approveAccountAdmin() {
+		try(Connection conn = ConnectionUtil.getConnection()){
+			User user = new User();
+			String sql = "SELECT * FROM user_info WHERE approval_status = 0;";
+			//Scanner sc = new Scanner(System.in);
+			PreparedStatement statement = conn.prepareStatement(sql);
+			ResultSet result = statement.executeQuery();
+			while(result.next())
+			{
+			user.setFirstName(result.getString("first_name"));
+			user.setLastName(result.getString("last_name"));
+			user.setUserName(result.getString("user_name"));
+			user.setAddress(result.getString("address"));
+			user.setPhoneNumber(result.getString("phone_number"));
+			user.setEmail(result.getString("email"));
+			user.setAccessType(result.getString("access_type"));
+			System.out.println(user);
+			}
+			System.out.println("Which user do you want to focus on?");
+			Scanner sc = new Scanner(System.in);
+			String uName = sc.nextLine();
+			if (uName.equals("back"))
+				return true;
+			String sqlTarget = "UPDATE user_info SET approval_status = ? WHERE user_name = ?";
+			PreparedStatement statementTarget = conn.prepareStatement(sqlTarget);
+			System.out.println("Do you want to:\n1: Approve\n2: Deny");
+			int choice = sc.nextInt();
+			if(choice == 1)
+			{
+				statementTarget.setInt(1, 2);
+			}
+			else if(choice == 2)
+			{
+				statementTarget.setInt(1, 1);
+			}
+			statementTarget.setString(2,uName);
+			statementTarget.executeUpdate();
+			System.out.println("Decision Successful");
+			log.info("Decision successful");
+			
 			return true;
 		}
 			catch(SQLException e) {

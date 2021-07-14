@@ -11,10 +11,14 @@ public interface LoginDAO {
 	
 	public boolean approveAccountEmployee();
 	
+	public boolean approveAccountAdmin();
+	
 	public boolean checkAccountEmployee(String uName);
 	
 	public boolean checkInfoEmployee(String uName);
 	
 	public boolean deleteAccount(String uName);
+	
+	public boolean editInformation(String uName);
 
 }

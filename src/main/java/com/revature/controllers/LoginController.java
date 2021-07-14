@@ -88,7 +88,8 @@ public class LoginController {
 				loginService.makeTransfer(uName, amount, transferAccount);
 				break;
 			case 4:
-				//loginService.updateInformation();
+				sc.nextLine();
+				loginService.editInformation(uName);
 				break;
 			case 5:
 				System.out.println("Thank you for choosing Rev Bank! Returning to the main menu");
@@ -175,7 +176,7 @@ public class LoginController {
 			
 			switch(response) {
 			case 1:
-				if (loginService.approveAccountEmployee())
+				if (loginService.approveAccountAdmin())
 					{
 						continue;
 					}

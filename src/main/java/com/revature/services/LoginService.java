@@ -26,6 +26,10 @@ public class LoginService {
 		return loginDAO.approveAccountEmployee();
 	}
 	
+	public boolean approveAccountAdmin() {
+		return loginDAO.approveAccountAdmin();
+	}
+	
 	public boolean checkAccountEmployee(String uName) {
 		return loginDAO.checkAccountEmployee(uName);
 	}
@@ -36,6 +40,10 @@ public class LoginService {
 	
 	public boolean deleteAccount(String uName) {
 		return loginDAO.deleteAccount(uName);
+	}
+	
+	public boolean editInformation(String uName) {
+		return loginDAO.editInformation(uName);
 	}
 
 }

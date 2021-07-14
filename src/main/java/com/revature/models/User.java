@@ -7,8 +7,9 @@ public class User {
 	private String phoneNumber;
 	private String address;
 	private String email;
+	private String accessType;
 	
-	public User(String firstName, String lastName, String userName, String phoneNumber, String address, String email) {
+	public User(String firstName, String lastName, String userName, String phoneNumber, String address, String email, String accessType) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -16,10 +17,19 @@ public class User {
 		this.phoneNumber = phoneNumber;
 		this.address = address;
 		this.email = email;
+		this.accessType = accessType;
 	}
 
 	public User() {
 		super();
+	}
+
+	public String getAccessType() {
+		return accessType;
+	}
+
+	public void setAccessType(String accessType) {
+		this.accessType = accessType;
 	}
 
 	public String getFirstName() {
@@ -74,6 +84,7 @@ public class User {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((accessType == null) ? 0 : accessType.hashCode());
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
@@ -92,6 +103,11 @@ public class User {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
+		if (accessType == null) {
+			if (other.accessType != null)
+				return false;
+		} else if (!accessType.equals(other.accessType))
+			return false;
 		if (address == null) {
 			if (other.address != null)
 				return false;
@@ -128,7 +144,10 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName + ", phoneNumber="
-				+ phoneNumber + ", address=" + address + ", email=" + email + "]";
+				+ phoneNumber + ", address=" + address + ", email=" + email + ", accessType=" + accessType + "]";
 	}
 
+	
+	
+	
 }

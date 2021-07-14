@@ -76,6 +76,7 @@ public class AccountController {
 					account.setLname(lName);
 					account.setuName(uName);
 					account.setpWord(pWord);
+					account.setAccessType(accessType);
 					break;
 				case 3:
 					trigger = false;
@@ -84,9 +85,11 @@ public class AccountController {
 					account.setLname(lName);
 					account.setuName(uName);
 					account.setpWord(pWord);
+					account.setAccessType(accessType);
 					break;
 				default:
 					System.out.println("That doesn't look right, lets try again.");
+					
 			}
 		}
 		
@@ -99,5 +102,6 @@ public class AccountController {
 		else {
 			System.out.println("An error has occured");
 		}
+		sc.nextLine();
 	}
 }

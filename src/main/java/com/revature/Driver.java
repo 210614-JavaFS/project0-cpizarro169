@@ -20,6 +20,7 @@ public class Driver {
 		while(true) {
 			System.out.println("What would you like to do?\n 1: Make an account\n 2: Log in\n 3: Exit");
 			int choice = sc.nextInt();
+			sc.nextLine();
 			
 			switch(choice) {
 				case 1:
