@@ -44,7 +44,7 @@ public class LoginDAOImpl implements LoginDAO {
 				else
 				{
 					System.out.println("Account is still awaiting approval");
-					log.warn("Your account was denied, please call for further assistance");
+					log.warn("Your account is still pending");
 					return "failure";
 				}
 			}
